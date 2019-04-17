@@ -1,0 +1,314 @@
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    font-family:  'Montserrat Alternates', sans-serif;
+    font-weight: normal;
+}
+
+#logo {
+    height: 40px;
+    width: 40;
+    padding-top: 5px;
+    float:left;
+    margin-left: 20px;
+    border-radius: 8px;
+}
+
+nav {
+    width: 100%;
+    height: 50px;
+    background-color: #43c6aa;
+}
+
+nav:nth-child(1) {
+    padding-left: 25px;
+}
+
+.navlink {
+    padding: 5px;
+    padding-top: 12px;
+    padding-left: 20px;
+    color: white;
+    font-size: 1.3em;
+    float: left;
+}
+
+.navlink a, .navlink a:link, .navlink a:visited, .navlink a:hover, .navlink a:active {
+    color: white;
+    text-decoration: none;
+    padding: 5px;
+    border-radius: 4px;
+    background-color: #43c6aa;
+    transition: background-color 0.4s ease;
+}
+
+.navlink a:hover {
+    transition: background-color 0.8s ease;
+    background-color: #30a088;
+}
+
+.navlink .active{
+    background-color: #0e8882;
+}
+
+#logout {
+    margin-right: 0px;
+}
+.domoForm {
+    height: 30px;
+    width: 800px;
+    margin-top:0px;
+    padding-top:10px;
+    border-bottom-right-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+.domoForm label {
+    display: inline-block;
+    width: 120px;
+    font-size: 1.2em;
+    color: white;
+}
+
+#mascotForm{
+    display: inline-block;
+    margin-bottom: 0px;
+}
+
+
+.makeDomoSubmit {
+    transition: background-color 0.4s ease;
+    display: inline-block;
+    width: 140px;
+    height: 25px;
+    background-color: #43c6aa;
+    border-radius: 10px;
+    color: white;
+    text-decoration: none;
+    margin-left: 10px;
+    border: 2px solid #237a68;
+}
+
+.makeDomoSubmit:link, .makeDomoSubmit:visited, .makeDomoSubmit:hover, .makeDomoSubmit:active {
+    color: white;
+}
+
+.makeDomoSubmit:hover {
+    transition: background-color 0.4s ease;
+    background-color: #1a8371;
+}
+
+.mainForm {
+    height: 300px;
+    width: 400px;
+    margin: 0 auto;
+    padding-top: 350px;
+    font-size: 1.2em;
+}
+
+.mainForm h3 {
+    text-align: center;
+}
+
+.mainForm label {
+    display: inline-block;
+    width: 200px;
+    margin-right: 10px;
+    text-align: right;
+    font-size: 1.2em;
+}
+
+.formSubmit {
+    transition: background-color 0.4s ease;
+    display: block;
+    text-align: center;
+    margin: 0 10px;
+    float: right;
+    margin-top: 14px;
+    font-size: 1.2em;
+    width: 140px;
+    background-color: #43c6aa;
+    border-radius: 10px;
+    border-color: #77d1be;
+    border: none;
+    padding: 3px 0px;
+    color: white;
+    text-decoration: none;
+}
+
+.formSubmit:link, .formSubmit:visited, .formSubmit:hover, .formSubmit:active {
+    color: white;
+}
+
+.formSubmit:hover {
+    transition: background-color 0.4s ease;
+    background-color: #30a088;
+}
+
+#upgrade{
+
+    margin: 0 50px;
+}
+
+.upgradeSubmit {
+    transition: background-color 0.4s ease;
+    display: block;
+    text-align: center;
+    margin-top: 14px;
+    font-size: 1.2em;
+    width: 240px;
+    background-color: #43c6aa;
+    border-radius: 10px;
+    border: none;
+    padding: 3px 0px;
+    color: white;
+    text-decoration: none;
+}
+.upgradeSubmit:hover {
+    transition: background-color 0.4s ease;
+    background-color: #30a088;
+}
+
+.formInput, .formInput2 {
+    text-align: center;
+    font-size: 1.1em;
+    width: 180px;
+    border-radius: 6px;
+    border: 2px solid #77d1be
+}
+.formInput {
+    margin-top: 10px;
+}
+
+.formInput:focus, .formInput2 {
+    outline: none;
+    box-shadow: 0px 0px 1px 1px #43c6aa;
+}
+
+#domoMessage {
+    display:none;
+    top: 250px;
+    width: 250px;
+    height: 650px;
+    position: absolute;
+    z-index: 200;
+    right: 0px;
+    overflow: hidden;
+}
+
+#domoMessage h3 {
+    width: 200px;
+    position: absolute;
+    top: 0px;
+    left: 20px;
+}
+
+#speech {
+    height: 120px;
+    width: 250px;
+    z-index:300;
+}
+
+#errorMessage {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #b5883d;
+    font-style: italic;
+}
+
+#domo {
+    z-index: 225;
+    margin-top: -20px;
+    margin-left: 0px;
+    height: 350px;
+    width: 350px;
+}
+
+#domos {
+    width: 40%;
+    min-width: 400px;
+    border: 2px solid #43c6aa;
+    border-radius: 4px;
+    margin: 0 auto;
+    margin-top: 100px;
+}
+
+.domo {
+    width: 95%;
+    margin: 0 auto;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    border: 2px solid #43c6aa;
+    border-radius: 4px;
+    background-color: #43c6aa;
+    padding: 10px;
+    min-height:60px;
+    overflow: hidden;
+    color: white;
+}
+
+.domo:hover {
+    transition: border-color 0.2s ease-out;
+    border-color: rgba(255,255,255, 0.8);
+    transition: background-color 2.6s ease-out;
+    background-color: #30a088;
+}
+
+
+.domoContent {
+    display: inline-block;
+}
+
+img.domoFace {
+    margin-left: 25px;
+    margin-right: 10px;
+    height: 100px;
+    width: 75px;
+    border-radius: 4px;
+    margin-top:10px;
+    float:left;
+}
+
+h3.emptyDomo {
+    width: 600px;
+    font-size: 1.5em;
+    margin: 0 auto;
+    text-align: center;
+    margin-top: 18px;
+}
+
+h3.domoName {
+    float:left;
+    width: 200px;
+    padding-left: 65px;
+    font-size: 1.5em;
+}
+
+h3.domoAge {
+    float:right;
+    text-align: left;
+    width: 100px;
+    padding-right: 40px;
+    font-size: 1.5em;
+}
+h3 {
+    font-weight: normal;
+}
+
+.domo:first-child {
+    margin-top: 10px;
+}
+
+.domo:last-child {
+    margin-bottom:10px;
+}
+
+#notFound {
+    width: 400px;
+    justify-content: center;
+    margin: auto;
+    text-align: center;
+}
