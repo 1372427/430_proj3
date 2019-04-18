@@ -3,6 +3,8 @@ const nodemailer = require('nodemailer');
 
 const Account = models.Account;
 
+const baseUrl = (process.NODE_ENV === 'production' ? 'https://project3-react.herokuapp.com/' : 'http://localhost:3000/');
+
 // set up information to send emails
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -242,7 +244,7 @@ const login = (request, response) => {
                 <p>There have been too many log in attempts with your username. 
                 Your account has been locked for your security.</p>
                 <p>Please click the link to unlock your account and reset your password. </p>
-                <a href="http://localhost:3000/unlock?username=${err.username}">
+                <a href="${baseUrl}unlock?username=${err.username}">
                 Click me to unlock your account!</a>
                 `,
                 };
@@ -322,7 +324,7 @@ const signup = (request, response) => {
         html: `<p>Dear ${accountData.username},</p>
         <p>Thank you for creating an account with Contest.</p>
         <p>Please click the link to validate your account. </p>
-        <a href="http://localhost:3000/validate?username=${accountData.username}">
+        <a href="${baseUrl}validate?username=${accountData.username}">
         Click me to validate your account!</a>
         `,
       };
