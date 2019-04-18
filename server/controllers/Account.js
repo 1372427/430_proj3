@@ -3,7 +3,7 @@ const nodemailer = require('nodemailer');
 
 const Account = models.Account;
 
-const baseUrl = (process.NODE_ENV === 'production' ? 'https://project3-react.herokuapp.com/' : 'http://localhost:3000/');
+const baseUrl = (process.env.NODE_ENV === 'production' ? 'https://project3-react.herokuapp.com/' : 'http://localhost:3000/');
 
 // set up information to send emails
 const transporter = nodemailer.createTransport({
