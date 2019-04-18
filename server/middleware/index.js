@@ -13,7 +13,7 @@ const requiresValidated = (req, res, next) => {
       console.log(err);
       return res.status(400).json({ error: 'An error occured' });
     }
-    if(docs.validated) return next();
+    if (docs.validated) return next();
     return res.redirect('/notValid');
   });
 };
@@ -24,7 +24,7 @@ const requiresNotValidated = (req, res, next) => {
       console.log(err);
       return res.status(400).json({ error: 'An error occured' });
     }
-    if(docs.validated) return res.redirect('/home');
+    if (docs.validated) return res.redirect('/home');
     return next();
   });
 };

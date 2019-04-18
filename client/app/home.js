@@ -28,7 +28,7 @@ const ContestList = function(props){
     //for each contest, show its name, description, reward, and deadline
     const contestNodes = props.contests.map(function(contest){
         return(
-            <div id={contest._id} key={contest._id} className="domo" onClick={(e) =>handleEnterContest(contest._id)}>
+            <div id={contest._id} key={contest._id} className="domo" onClick={(e) =>handleEnterContest(contest)}>
                 <img src={`/assets/img/mascots/${contest.mascot}`} alt="cat" className="domoFace"/>
                 
                 <div className="domoContent">

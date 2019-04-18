@@ -29,24 +29,28 @@ const EntryWindow = (props) => {
 
     let csrf = props.csrf;
     let contest = props.contest;
-
+    console.log(contest)
     //return form with input for name and entry content
     return (
-        <form id="entryForm"
-            name="entryForm"
-            onSubmit={handleEntry}
-            action="/makeEntry"
-            method="POST"
-            className="mainForm"
-        >
-            <label htmlFor="name">Name: </label>
-            <input  className="formInput" id="name" type="text" name="name" placeholder="name"/>
-            <label htmlFor="content">Content: </label>
-            <input  className="formInput" id="content" type="text" name="content" placeholder="entry"/>
-            <input type="hidden" name="_csrf" value={csrf}/>
-            <input type="hidden" name="contest" value={contest}/>
-            <input className="formSubmit" type="submit" value="Submit"/>
-        </form>
+        <div>
+            <h1>Contest Name: {contest.name}</h1>
+            <h1>Description: {contest.description}</h1>
+            <form id="entryForm"
+                name="entryForm"
+                onSubmit={handleEntry}
+                action="/makeEntry"
+                method="POST"
+                className="mainForm"
+            >
+                <label htmlFor="name">Name: </label>
+                <input  className="formInput" id="name" type="text" name="name" placeholder="name"/>
+                <label htmlFor="content">Content: </label>
+                <input  className="formInput" id="content" type="text" name="content" placeholder="entry"/>
+                <input type="hidden" name="_csrf" value={csrf}/>
+                <input type="hidden" name="contest" value={contest._id}/>
+                <input className="formSubmit" type="submit" value="Submit"/>
+            </form>
+        </div>
     );
 };
 

@@ -12,7 +12,7 @@ gulp.task('sass', () => {
 });
 
 gulp.task('home', () => {
-    gulp.src(['./client/*/*.js',  '!./client/login/*.js'])
+    gulp.src(['./client/*/*.js',  '!./client/login/*.js', '!./client/unlock/*.js'])
         .pipe(babel({
             presets: ['env', 'react']
         })).pipe(concat('homeBundle.js'))
@@ -21,7 +21,7 @@ gulp.task('home', () => {
 
 
 gulp.task('login', () => {
-    gulp.src(['./client/*/*.js', '!./client/app/*.js'])
+    gulp.src(['./client/*/*.js', '!./client/app/*.js', '!./client/unlock/*.js'])
         .pipe(babel({
             presets: ['env', 'react']
         }))

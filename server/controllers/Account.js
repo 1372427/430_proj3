@@ -228,7 +228,41 @@ const login = (request, response) => {
   // check if passowrd is correct
   return Account.AccountModel.authenticate(username, password, (err, account) => {
     if (err || !account) {
-      return res.status(401).json({ error: 'Wrong username or password' });
+      if (err && err.username) {
+        return Account.AccountModel.updateOne({ _id: err._id },
+          { signInAttempts: err.signInAttempts + 1 }).then(() => {
+            if (err.signInAttempts >= 4) {
+              if (err.signInAttempts === 4) {
+               // send confirmation email
+                const mailOptions = {
+                  from: 'contest430mvc@gmail.com',
+                  to: err.email,
+                  subject: 'Too Many Attempts',
+                  html: `<p>Dear ${err.username},</p>
+                <p>There have been too many log in attempts with your username. 
+                Your account has been locked for your security.</p>
+                <p>Please click the link to unlock your account and reset your password. </p>
+                <a href="http://localhost:3000/unlock?username=${err.username}">
+                Click me to unlock your account!</a>
+                `,
+                };
+
+                transporter.sendMail(mailOptions, (error, info) => {
+                  if (error) console.log(error);
+                  else console.log(`email sent: ${info.response}`);
+                });
+              }
+              return res.json({ redirect: '/exceed' });
+            }
+            return res.status(401).json({ error: 'Wrong password' });
+          }
+        );
+      }
+      return res.status(401).json({ error: 'Wrong login info' });
+    }
+
+    if (account.signInAttempts >= 5) {
+      return res.json({ redirect: '/exceed' });
     }
 
     // set up session if accout is correct
@@ -288,8 +322,9 @@ const signup = (request, response) => {
         html: `<p>Dear ${accountData.username},</p>
         <p>Thank you for creating an account with Contest.</p>
         <p>Please click the link to validate your account. </p>
-        <a href="http://localhost:3000/validate?username=${accountData.username}">Click me to validate your account!</a>
-        `
+        <a href="http://localhost:3000/validate?username=${accountData.username}">
+        Click me to validate your account!</a>
+        `,
       };
 
       transporter.sendMail(mailOptions, (error, info) => {
@@ -313,15 +348,31 @@ const signup = (request, response) => {
 };
 
 const validate = (req, res) => {
-  upgradePromise = Account.AccountModel.updateOne(
-    { username: req.query.username }, {validated: true}
-  ).then(() => res.redirect('/home'))
-}
+  Account.AccountModel.updateOne(
+    { username: req.query.username }, { validated: true }
+  ).then(() => res.redirect('/home'));
+};
 
-const notValid = (req, res) => {
-  
-  return res.render('notValid', {mascot: 'assets/img/mascots/9.png'});
-}
+const notValid = (req, res) => res.render('notify', { message: [
+  'An email has been sent.',
+  'Please validate your account!'], mascot:
+   'assets/img/mascots/9.png' });
+
+const getTooManyAttempts = (req, res) => res.render('notify',
+  { message: ['Too many login attempts!',
+    'Please check your email to unlock your account.'],
+    mascot: 'assets/img/mascots/9.png' });
+
+const unlock = (req, request) => {
+  const res = request;
+  Account.AccountModel.updateOne(
+    { username: req.query.username }, { signInAttempts: 0 }
+  ).then(() => res.redirect(`/resetPass/${req.query.username}`));
+};
+
+const getReset = (req, res) => {
+  console.log(`Implement me!!!!${res}${req}`);
+};
 
 const getToken = (request, response) => {
   const req = request;
@@ -344,3 +395,6 @@ module.exports.passChange = passChange;
 module.exports.emailChange = emailChange;
 module.exports.validate = validate;
 module.exports.notValid = notValid;
+module.exports.getTooManyAttempts = getTooManyAttempts;
+module.exports.unlock = unlock;
+module.exports.getReset = getReset;

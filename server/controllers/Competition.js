@@ -35,7 +35,8 @@ const makeContest = (req, res) => {
     return res.status(400).json({ error: 'Fill out all fields!' });
   }
   let tags = [];
-  if(req.body.tags){
+  if (req.body.tags) {
+    tags = req.body.tags;
     tags.trim();
     tags = req.body.tags.split(' ');
   }
@@ -48,7 +49,7 @@ const makeContest = (req, res) => {
     reward: req.body.reward,
     deadline: req.body.deadline,
     mascot: mascots.mascots[req.session.account.mascot],
-    tags: tags
+    tags,
   };
   // create new contest
   const newContest = new Contest.ContestModel(contestData);
@@ -113,9 +114,9 @@ const getContest = (req, res) => {
 };
 
 const getTags = (request, response) => {
-  let res = response;
-  return Contest.ContestModel.getTags().then((d) =>  res.json({tags: d}));
-}
+  const res = response;
+  return Contest.ContestModel.getTags().then((d) => res.json({ tags: d }));
+};
 
 // set the winner to a contest and email the winner
 const setWin = (request, response) => {

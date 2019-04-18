@@ -17,8 +17,9 @@
     <div class="navlink"><a id="loginButton" href="/">Home</a></div>
   </nav>
   <div id="notFound">
-    <h1>An email has been sent.</h1>
-    <h1>Please validate your account!</h1>
+    {{#each message}}
+    <h1>{{this}}</h1>
+    {{/each}}
     <img id="domo" src={{mascot}} alt="chibi"/>
     </div>
 </body>

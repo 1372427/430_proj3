@@ -58,8 +58,8 @@ const CompetitionSchema = new mongoose.Schema({
   },
   tags: {
     type: Array,
-    default: []
-  }
+    default: [],
+  },
 });
 
 CompetitionSchema.statics.toAPI = (doc) => ({
@@ -99,7 +99,7 @@ CompetitionSchema.statics.findByDeadline = (date, callback) => {
     'name description reward deadline createdDate mascot tags').exec(callback);
 };
 
-CompetitionSchema.statics.getTags = () => CompetitionModel.distinct("tags");
+CompetitionSchema.statics.getTags = () => CompetitionModel.distinct('tags');
 
 CompetitionModel = mongoose.model('Contest', CompetitionSchema);
 

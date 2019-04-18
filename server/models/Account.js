@@ -48,7 +48,7 @@ const AccountSchema = new mongoose.Schema({
   signInAttempts: {
     type: Number,
     default: 0,
-  }
+  },
 });
 
 AccountSchema.statics.toAPI = doc => ({
@@ -110,7 +110,7 @@ AccountModel.findByUsername(username, (err, doc) => {
       return callback(null, doc);
     }
 
-    return callback();
+    return callback(doc);
   });
 });
 

@@ -455,32 +455,48 @@ var EntryWindow = function EntryWindow(props) {
 
     var csrf = props.csrf;
     var contest = props.contest;
-
+    console.log(contest);
     //return form with input for name and entry content
     return React.createElement(
-        "form",
-        { id: "entryForm",
-            name: "entryForm",
-            onSubmit: handleEntry,
-            action: "/makeEntry",
-            method: "POST",
-            className: "mainForm"
-        },
+        "div",
+        null,
         React.createElement(
-            "label",
-            { htmlFor: "name" },
-            "Name: "
+            "h1",
+            null,
+            "Contest Name: ",
+            contest.name
         ),
-        React.createElement("input", { className: "formInput", id: "name", type: "text", name: "name", placeholder: "name" }),
         React.createElement(
-            "label",
-            { htmlFor: "content" },
-            "Content: "
+            "h1",
+            null,
+            "Description: ",
+            contest.description
         ),
-        React.createElement("input", { className: "formInput", id: "content", type: "text", name: "content", placeholder: "entry" }),
-        React.createElement("input", { type: "hidden", name: "_csrf", value: csrf }),
-        React.createElement("input", { type: "hidden", name: "contest", value: contest }),
-        React.createElement("input", { className: "formSubmit", type: "submit", value: "Submit" })
+        React.createElement(
+            "form",
+            { id: "entryForm",
+                name: "entryForm",
+                onSubmit: handleEntry,
+                action: "/makeEntry",
+                method: "POST",
+                className: "mainForm"
+            },
+            React.createElement(
+                "label",
+                { htmlFor: "name" },
+                "Name: "
+            ),
+            React.createElement("input", { className: "formInput", id: "name", type: "text", name: "name", placeholder: "name" }),
+            React.createElement(
+                "label",
+                { htmlFor: "content" },
+                "Content: "
+            ),
+            React.createElement("input", { className: "formInput", id: "content", type: "text", name: "content", placeholder: "entry" }),
+            React.createElement("input", { type: "hidden", name: "_csrf", value: csrf }),
+            React.createElement("input", { type: "hidden", name: "contest", value: contest._id }),
+            React.createElement("input", { className: "formSubmit", type: "submit", value: "Submit" })
+        )
     );
 };
 
@@ -585,7 +601,7 @@ var ContestList = function ContestList(props) {
         return React.createElement(
             'div',
             { id: contest._id, key: contest._id, className: 'domo', onClick: function onClick(e) {
-                    return handleEnterContest(contest._id);
+                    return handleEnterContest(contest);
                 } },
             React.createElement('img', { src: '/assets/img/mascots/' + contest.mascot, alt: 'cat', className: 'domoFace' }),
             React.createElement(

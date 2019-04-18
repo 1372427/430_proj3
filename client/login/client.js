@@ -55,6 +55,16 @@ const handleSignup = (e) => {
     return false;
 };
 
+const handleForgotPass = (e) => {
+    e.preventDefault();
+
+    //hide error message
+    $("#domoMessage").animate({width:'hide'}, 350);
+
+    //all is good, send request to server
+    sendAjax('GET', `${$("#forgotPassForm").attr("action")}?${$("#forgotPassForm").serialize()}`, null, redirect);
+}
+
 //React Component for login form
 const LoginWindow = (props) => {
     //hide error message
@@ -79,8 +89,8 @@ const LoginWindow = (props) => {
         <input className="formSubmit" type="submit" value="Sign in" />
         </form>
         <form id="forgotPassForm" name="forgotPassForm"
-            onSubmit={handleLogin}
-            action="/login"
+            onSubmit={handleForgotPass}
+            action="/resetPass"
             method="POST"
         >
         <input type="hidden" name="_csrf" value={props.csrf}/>
