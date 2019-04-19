@@ -152,10 +152,11 @@ const emailChange = (req, res) => {
 
 // handle password change
 const passChange = (req, res) => {
+  const username = req.body.username || req.session.account.username;
   // check if there is a new password
   if (!req.body.pass) return res.status(400).json({ error: 'Please put a new password!' });
   // find account
-  return Account.AccountModel.findByUsername(req.session.account.username, (err, docs) => {
+  return Account.AccountModel.findByUsername(username, (err, docs) => {
     if (err) {
       console.log(err);
       return res.status(400).json({ error: 'An error occured' });
@@ -170,7 +171,7 @@ const passChange = (req, res) => {
     // rehash the password and update
     return Account.AccountModel.generateHash(req.body.pass, (salt, hash) => {
       const upgradePromise = Account.AccountModel.updateOne(
-      { username: req.session.account.username }, { password: hash, salt });
+      { username }, { password: hash, salt });
 
       // if update is successful, send email
       upgradePromise.then(() => {
@@ -372,9 +373,62 @@ const unlock = (req, request) => {
   ).then(() => res.redirect(`/resetPass/${req.query.username}`));
 };
 
-const getReset = (req, res) => {
-  console.log(`Implement me!!!!${res}${req}`);
+const getReset = (req, res) => res.render('reset');
+
+const getResetSendEmail = (req, res) => {
+  if (!req.body.email || !req.body.username) {
+    return res.status(400).json({ error: 'Fill out form!' });
+  }
+  // check username and email are correct
+  return Account.AccountModel.findByUsername(req.body.username, (err, docs) => {
+    if (err) {
+      console.log(err);
+      return res.status(400).json({ error: 'An error occured' });
+    }
+    if (!docs) {
+      return res.status(400).json({ error: "Username doesn't exist" });
+    }
+
+    // only send back relevant information
+    const accountData = {
+      username: docs.username,
+      email: docs.email,
+      type: docs.type,
+      mascot: docs.mascot,
+      id: docs._id,
+    };
+
+    if (accountData.email === req.body.email) {
+      // send email
+      const mailOptions = {
+        from: 'contest430mvc@gmail.com',
+        to: accountData.email,
+        subject: 'Reset Password Request',
+        html: `<p>Dear ${accountData.username},</p>
+        <p>A request has been made to reset your account password.</p>
+        <p>Please click the link to reset your password. </p>
+        <p>If you did not make this request, please ignore this message. </p>
+        <a href="${baseUrl}resetPage?username=${accountData.username}">
+        Click me to reset your password!</a>
+        `,
+      };
+
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) console.log(error);
+        else console.log(`email sent: ${info.response}`);
+      });
+
+      // redirect to notify page
+      return res.json({ redirect: '/resetSent' });
+    }
+    return res.status(400).json({ error: 'Incorrect Email' });
+  });
 };
+
+const resetSent = (req, res) => res.render('notify', { message: ['An email has been sent',
+  'Check your email to reset your password'],
+  mascot: 'assets/img/mascots/9.png' });
+
 
 const getToken = (request, response) => {
   const req = request;
@@ -400,3 +454,6 @@ module.exports.notValid = notValid;
 module.exports.getTooManyAttempts = getTooManyAttempts;
 module.exports.unlock = unlock;
 module.exports.getReset = getReset;
+module.exports.getResetSendEmail = getResetSendEmail;
+module.exports.resetSent = resetSent;
+module.exports.resetPass = passChange;

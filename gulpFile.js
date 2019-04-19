@@ -29,6 +29,15 @@ gulp.task('login', () => {
         .pipe(gulp.dest('./hosted/'));
 });
 
+gulp.task('unlock', () => {
+    gulp.src(['./client/*/*.js', '!./client/app/*.js', '!./client/login/*.js'])
+    .pipe(babel({
+        presets: ['env', 'react']
+    }))
+    .pipe(concat('unlockBundle.js'))
+    .pipe(gulp.dest('./hosted/'));
+})
+
 gulp.task('lint', () => {
     gulp.src('./server/*.js')
         .pipe(eslint())
@@ -47,6 +56,7 @@ gulp.task('watch', () => {
     gulp.watch('./scss/style.scss', ['sass']);
     gulp.watch('./client/app/*.js', ['home']);
     gulp.watch('./client/login/*.js', [ 'login']);
+    gulp.watch('./client/unlock/*.js', [ 'unlock']);
     nodemon({
         script: './server/app.js',
         ext: 'js',

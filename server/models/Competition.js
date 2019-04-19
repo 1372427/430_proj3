@@ -87,7 +87,7 @@ CompetitionSchema.statics.findById = (id, callback) => {
 };
 
 // search for competition by deadline greater than or equal to the given date
-CompetitionSchema.statics.findByDeadline = (date, callback) => {
+CompetitionSchema.statics.findByDeadline = (date, sort, callback) => {
   const search = {
     deadline: {
       $gte: date,
@@ -95,8 +95,9 @@ CompetitionSchema.statics.findByDeadline = (date, callback) => {
     winner: null,
   };
 
-  return CompetitionModel.find(search).select(
-    'name description reward deadline createdDate mascot tags').exec(callback);
+  return CompetitionModel.find(search).sort(sort)
+    .select('name description reward deadline createdDate mascot tags')
+    .exec(callback);
 };
 
 CompetitionSchema.statics.getTags = () => CompetitionModel.distinct('tags');

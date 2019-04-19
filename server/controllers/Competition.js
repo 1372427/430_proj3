@@ -90,9 +90,9 @@ const getContestsByOwner = (request, response) => {
 // get all contests with a deadline in the future
 const getContestsByDate = (request, response) => {
   const res = response;
-
+  const sort = JSON.parse(`{${request.query.sort.replace('_', ':')}}`);
   // query database for all contests with a deadline greater or equal to today
-  return Contest.ContestModel.findByDeadline(Date.now(), (err, docs) => {
+  return Contest.ContestModel.findByDeadline(Date.now(), sort, (err, docs) => {
     if (err) {
       console.log(err);
       return res.status(400).json({ error: 'An error occurred' });

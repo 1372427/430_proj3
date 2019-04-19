@@ -57,14 +57,26 @@ var handleSignup = function handleSignup(e) {
     return false;
 };
 
-var handleForgotPass = function handleForgotPass(e) {
+var handleForgotPass = function handleForgotPass(e, csrf) {
     e.preventDefault();
 
     //hide error message
     $("#domoMessage").animate({ width: 'hide' }, 350);
 
+    ReactDOM.render(React.createElement(ResetWindow, { csrf: csrf }), document.querySelector("#content"));
+    return false;
+};
+
+var handleReset = function handleReset(e) {
+    e.preventDefault();
+    if ($("#user").val() === '' || $("#email").val() === '') {
+        handleError("All fields are required");
+        return false;
+    }
     //all is good, send request to server
-    sendAjax('GET', $("#forgotPassForm").attr("action") + "?" + $("#forgotPassForm").serialize(), null, redirect);
+    sendAjax('POST', $("#resetForm").attr("action"), $("#resetForm").serialize(), redirect);
+
+    return false;
 };
 
 //React Component for login form
@@ -104,7 +116,9 @@ var LoginWindow = function LoginWindow(props) {
         React.createElement(
             "form",
             { id: "forgotPassForm", name: "forgotPassForm",
-                onSubmit: handleForgotPass,
+                onSubmit: function onSubmit(e) {
+                    return handleForgotPass(e, props.csrf);
+                },
                 action: "/resetPass",
                 method: "POST"
             },
@@ -156,6 +170,36 @@ var SignupWindow = function SignupWindow(props) {
         React.createElement("input", { className: "formInput", id: "pass2", type: "password", name: "pass2", placeholder: "retype password" }),
         React.createElement("input", { type: "hidden", name: "_csrf", value: props.csrf }),
         React.createElement("input", { className: "formSubmit", type: "submit", value: "Sign Up" })
+    );
+};
+
+var ResetWindow = function ResetWindow(props) {
+    //hide error message
+    $("#domoMessage").animate({ width: 'hide' }, 350);
+
+    return React.createElement(
+        "form",
+        { id: "resetForm",
+            name: "resetForm",
+            onSubmit: handleReset,
+            action: "/reset",
+            method: "POST",
+            className: "mainForm"
+        },
+        React.createElement(
+            "label",
+            { htmlFor: "username" },
+            "Username: "
+        ),
+        React.createElement("input", { className: "formInput", id: "user", type: "text", name: "username", placeholder: "username" }),
+        React.createElement(
+            "label",
+            { htmlFor: "email" },
+            "Email: "
+        ),
+        React.createElement("input", { className: "formInput", id: "email", type: "text", name: "email", placeholder: "email" }),
+        React.createElement("input", { type: "hidden", name: "_csrf", value: props.csrf }),
+        React.createElement("input", { className: "formSubmit", type: "submit", value: "Reset" })
     );
 };
 

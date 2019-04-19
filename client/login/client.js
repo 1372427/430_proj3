@@ -55,14 +55,26 @@ const handleSignup = (e) => {
     return false;
 };
 
-const handleForgotPass = (e) => {
+const handleForgotPass = (e, csrf) => {
     e.preventDefault();
 
     //hide error message
     $("#domoMessage").animate({width:'hide'}, 350);
 
+    ReactDOM.render(<ResetWindow csrf={csrf}/>, document.querySelector("#content"));
+    return false;
+}
+
+const handleReset = (e) => {
+    e.preventDefault();
+    if($("#user").val() === '' ||  $("#email").val() === ''){
+        handleError("All fields are required");
+        return false;
+    }
     //all is good, send request to server
-    sendAjax('GET', `${$("#forgotPassForm").attr("action")}?${$("#forgotPassForm").serialize()}`, null, redirect);
+    sendAjax('POST', $("#resetForm").attr("action"), $("#resetForm").serialize(), redirect);
+
+    return false;
 }
 
 //React Component for login form
@@ -89,7 +101,7 @@ const LoginWindow = (props) => {
         <input className="formSubmit" type="submit" value="Sign in" />
         </form>
         <form id="forgotPassForm" name="forgotPassForm"
-            onSubmit={handleForgotPass}
+            onSubmit={(e) => handleForgotPass(e, props.csrf)}
             action="/resetPass"
             method="POST"
         >
@@ -128,6 +140,28 @@ const SignupWindow = (props) => {
         </form>
     );
 };
+
+const ResetWindow = (props) => {
+    //hide error message
+    $("#domoMessage").animate({width:'hide'}, 350);
+
+    return (
+        <form id="resetForm"
+            name="resetForm"
+            onSubmit={handleReset}
+            action="/reset"
+            method="POST"
+            className="mainForm"
+        >
+            <label htmlFor="username">Username: </label>
+            <input  className="formInput" id="user" type="text" name="username" placeholder="username"/>
+            <label htmlFor="email">Email: </label>
+            <input  className="formInput" id="email" type="text" name="email" placeholder="email"/>
+            <input type="hidden" name="_csrf" value={props.csrf}/>
+            <input className="formSubmit" type="submit" value="Reset"/>
+        </form>
+    );
+}
 
 //call the react component for the login form
 const createLoginWindow = (csrf) => {

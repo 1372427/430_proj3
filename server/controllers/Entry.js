@@ -23,7 +23,7 @@ const makeEntryPage = (req, res) => {
         `assets/img/mascots/${mascots.mascots[req.session.account.mascot]}` });
     });
   } else {
-    Contest.ContestModel.findByDeadline(Date.now(), (err, docs) => {
+    Contest.ContestModel.findByDeadline(Date.now(), null, (err, docs) => {
       if (err) {
         console.log(err);
         return res.status(400).json({ error: 'An error occured' });

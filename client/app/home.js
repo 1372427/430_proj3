@@ -6,6 +6,10 @@ const handleEnterContest = (id) => {
     createEntryWindow(csrf, id);
 }
 
+const handleSort = (e) => {
+    loadCompetitionsFromServer(document.querySelector('select').value)
+}
+
 //React Component to show current contests
 const ContestList = function(props){
     //hide error message
@@ -45,6 +49,16 @@ const ContestList = function(props){
     //show all contests in list
     return (
         <div className="domoList">
+        <h3>Filters: </h3>
+        <h3>Sort: </h3>
+        <select onChange={handleSort}>
+            <option value='"deadline"_-1'>Oldest</option>
+            <option value='"deadline"_1'>Newest</option>
+            <option value='"reward"_-1'>Least Reward</option>
+            <option value='"reward"_1'>Most Reward</option>
+            <option value='"name"_1'>A-Z</option>
+            <option value='"name"_-1'>Z-A</option>
+        </select>
             {contestNodes}
         </div>
     );
@@ -52,10 +66,10 @@ const ContestList = function(props){
 
 
 //query the server to get the account type and current contests
-const loadCompetitionsFromServer = () => {
+const loadCompetitionsFromServer = (sort) => {
     sendAjax('GET', '/accountInfo', null, (data) => {
         let type = data.account.type;
-        sendAjax('GET', '/getContests', null, (data) => {
+        sendAjax('GET', `/getContests?sort=${sort}`, null, (data) => {
             ReactDOM.render(
                 <ContestList contests={data.contests} type={type}/>, document.querySelector("#app")
             );
@@ -94,7 +108,7 @@ const setup = function(csrf){
     });
 
     //query server to update contest list
-    loadCompetitionsFromServer();
+    loadCompetitionsFromServer('"deadline"_1');
 };
 
 //get csrf token then set  up page

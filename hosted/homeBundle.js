@@ -573,6 +573,10 @@ var handleEnterContest = function handleEnterContest(id) {
     createEntryWindow(csrf, id);
 };
 
+var handleSort = function handleSort(e) {
+    loadCompetitionsFromServer(document.querySelector('select').value);
+};
+
 //React Component to show current contests
 var ContestList = function ContestList(props) {
     //hide error message
@@ -645,15 +649,59 @@ var ContestList = function ContestList(props) {
     return React.createElement(
         'div',
         { className: 'domoList' },
+        React.createElement(
+            'h3',
+            null,
+            'Filters: '
+        ),
+        React.createElement(
+            'h3',
+            null,
+            'Sort: '
+        ),
+        React.createElement(
+            'select',
+            { onChange: handleSort },
+            React.createElement(
+                'option',
+                { value: '"deadline"_-1' },
+                'Oldest'
+            ),
+            React.createElement(
+                'option',
+                { value: '"deadline"_1' },
+                'Newest'
+            ),
+            React.createElement(
+                'option',
+                { value: '"reward"_-1' },
+                'Least Reward'
+            ),
+            React.createElement(
+                'option',
+                { value: '"reward"_1' },
+                'Most Reward'
+            ),
+            React.createElement(
+                'option',
+                { value: '"name"_1' },
+                'A-Z'
+            ),
+            React.createElement(
+                'option',
+                { value: '"name"_-1' },
+                'Z-A'
+            )
+        ),
         contestNodes
     );
 };
 
 //query the server to get the account type and current contests
-var loadCompetitionsFromServer = function loadCompetitionsFromServer() {
+var loadCompetitionsFromServer = function loadCompetitionsFromServer(sort) {
     sendAjax('GET', '/accountInfo', null, function (data) {
         var type = data.account.type;
-        sendAjax('GET', '/getContests', null, function (data) {
+        sendAjax('GET', '/getContests?sort=' + sort, null, function (data) {
             ReactDOM.render(React.createElement(ContestList, { contests: data.contests, type: type }), document.querySelector("#app"));
         });
     });
@@ -688,7 +736,7 @@ var setup = function setup(csrf) {
     });
 
     //query server to update contest list
-    loadCompetitionsFromServer();
+    loadCompetitionsFromServer('"deadline"_1');
 };
 
 //get csrf token then set  up page

@@ -29,7 +29,10 @@ const router = (app) => {
   app.get('/validate', controllers.Account.validate);
   app.get('/unlock', controllers.Account.unlock);
   app.get('/exceed', controllers.Account.getTooManyAttempts);
-  app.get('/resetPass', controllers.Account.getReset);
+  app.post('/reset', controllers.Account.getResetSendEmail);
+  app.get('/resetPage', controllers.Account.getReset);
+  app.post('/resetPage', controllers.Account.resetPass);
+  app.get('/resetSent', controllers.Account.resetSent);
   app.post('/setWinner', mid.requiresLogin, mid.requiresValidated, controllers.Competition.setWin);
   app.get('/notValid', mid.requiresSecure, mid.requiresNotValidated, controllers.Account.notValid);
   app.get('/', mid.requiresSecure, mid.requiresLogout, controllers.Account.loginPage);

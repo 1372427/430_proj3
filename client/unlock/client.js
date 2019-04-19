@@ -6,8 +6,12 @@ const handleReset = (e) => {
     $("#domoMessage").animate({width:'hide'}, 350);
 
     //check all fields have values
-    if($("#user").val() == '' || $("#pass").val() == ''){
+    if($("#pass2").val() == '' || $("#pass").val() == ''){
         handleError("Fill all fields!");
+        return false;
+    }
+    if($("#pass2").val() !== $("#pass").val()){
+        handleError("Passwords don't match!");
         return false;
     }
     
@@ -28,7 +32,7 @@ const ResetWindow = (props) => {
         <div>
         <form id="loginForm" name="loginForm"
             onSubmit={handleReset}
-            action="/login"
+            action="/resetPage"
             method="POST"
             className="mainForm"
         >
@@ -36,16 +40,10 @@ const ResetWindow = (props) => {
         <input className="formInput" id="user" type="text" name="username" placeholder="username"/>
         <label htmlFor="pass">Password: </label>
         <input  className="formInput" id="pass" type="password" name="pass" placeholder="password"/>
+        <label htmlFor="pass2">Password: </label>
+        <input  className="formInput" id="pass2" type="password" name="pass2" placeholder="confirm password"/>
         <input type="hidden" name="_csrf" value={props.csrf}/>
-        <input className="formSubmit" type="submit" value="Sign in" />
-        </form>
-        <form id="forgotPassForm" name="forgotPassForm"
-            onSubmit={handleLogin}
-            action="/login"
-            method="POST"
-        >
-        <input type="hidden" name="_csrf" value={props.csrf}/>
-        <input className="formSubmit" type="submit" value="Forgot Password" />
+        <input className="formSubmit" type="submit" value="Reset Password" />
         </form>
         </div>
     );
