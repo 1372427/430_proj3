@@ -7,7 +7,7 @@ const handleEnterContest = (id) => {
 }
 
 const handleSort = (e) => {
-    loadCompetitionsFromServer(document.querySelector('select').value)
+    loadCompetitionsFromServer(document.querySelector('#sort').value)
 }
 
 //React Component to show current contests
@@ -40,18 +40,30 @@ const ContestList = function(props){
                 <h3 >Description: {contest.description}</h3>
                 <h3 >Reward: ${contest.reward}</h3>
                 <h3 >Deadline: {contest.deadline.substring(0,10)}</h3>
-                <h3>Tags: {contest.tags}</h3>
+                <h3>Tags: {contest.tags.join(", ")}</h3>
                 </div>
             </div>
         );
     });
 
+    let addTag = (e) => {
+        let selected = props.selectedTags;
+        selected.push(e.target.id)
+        ReactDOM.render( <ContestList contests={props.contests} type={props.type} tags={props.tags} selectedTags={selected}/>, document.querySelector("#app"))
+    }
+
+    let tagNodes = props.tags.map((tag) => (<option id={tag} onClick={addTag}>{tag}</option>))
+    
     //show all contests in list
     return (
         <div className="domoList">
-        <h3>Filters: </h3>
+        <h3>Filters: {props.selectedTags}</h3>
+        <select>
+            {tagNodes}
+        </select>
+
         <h3>Sort: </h3>
-        <select onChange={handleSort}>
+        <select id="sort" onChange={handleSort}>
             <option value='"deadline"_-1'>Oldest</option>
             <option value='"deadline"_1'>Newest</option>
             <option value='"reward"_-1'>Least Reward</option>
@@ -70,9 +82,13 @@ const loadCompetitionsFromServer = (sort) => {
     sendAjax('GET', '/accountInfo', null, (data) => {
         let type = data.account.type;
         sendAjax('GET', `/getContests?sort=${sort}`, null, (data) => {
-            ReactDOM.render(
-                <ContestList contests={data.contests} type={type}/>, document.querySelector("#app")
-            );
+            let contests = data.contests
+            sendAjax('GET', '/tags', null, (data) => {
+
+                ReactDOM.render(
+                    <ContestList contests={contests} type={type} tags={data.tags} selectedTags={[]}/>, document.querySelector("#app")
+                );
+            })
         });
     });
 };
@@ -97,7 +113,7 @@ const setup = function(csrf){
 
     homeButton.addEventListener("click", (e) => {
         e.preventDefault();
-        loadCompetitionsFromServer(csrf);
+        loadCompetitionsFromServer('"deadline"_1');
         return false;
     });
 

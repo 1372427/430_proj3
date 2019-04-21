@@ -38,7 +38,7 @@ const makeContest = (req, res) => {
   if (req.body.tags) {
     tags = req.body.tags;
     tags.trim();
-    tags = req.body.tags.split(' ');
+    tags = req.body.tags.split(',');
   }
 
   // set up information
@@ -118,6 +118,26 @@ const getTags = (request, response) => {
   return Contest.ContestModel.getTags().then((d) => res.json({ tags: d }));
 };
 
+const addTag = (req, res) => {
+  const tag = req.query.tag.split(',');
+
+  // set up information
+  const contestData = {
+    name: 'Tags',
+    owner: req.session.account._id,
+    description: 'To put in tags',
+    reward: 0.00,
+    deadline: new Date(2018),
+    mascot: '',
+    tags: tag,
+  };
+  // create new contest
+  const newContest = new Contest.ContestModel(contestData);
+
+  // save contest
+  return newContest.save().then(res.json({ status: 'done' }));
+};
+
 // set the winner to a contest and email the winner
 const setWin = (request, response) => {
   const res = response;
@@ -185,3 +205,4 @@ module.exports.getContestsByDate = getContestsByDate;
 module.exports.setWin = setWin;
 module.exports.getContests = getContest;
 module.exports.getTags = getTags;
+module.exports.addTag = addTag;

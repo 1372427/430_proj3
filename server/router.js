@@ -26,6 +26,7 @@ const router = (app) => {
   controllers.Entry.getEntriesByContest);
   app.post('/makeContest', mid.requiresLogin, mid.requiresValidated, controllers.Competition.make);
   app.get('/tags', mid.requiresLogin, mid.requiresValidated, controllers.Competition.getTags);
+  app.get('/addTag', mid.requiresLogin, mid.requiresValidated, controllers.Competition.addTag);
   app.get('/validate', controllers.Account.validate);
   app.get('/unlock', controllers.Account.unlock);
   app.get('/exceed', controllers.Account.getTooManyAttempts);

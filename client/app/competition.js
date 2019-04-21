@@ -96,7 +96,7 @@ const CompetitionWindow = (props) => {
         
             {contestNodes}
             
-        <button className="formSubmit" onClick={() => sendAjax('GET','/tags', null, (d) => ReactDOM.render(<MakeCompetitionWindow csrf={csrf} tags={d.tags}/>, document.querySelector('#app')))
+        <button className="formSubmit" onClick={() => sendAjax('GET','/tags', null, (d) => ReactDOM.render(<MakeCompetitionWindow csrf={csrf} allTags={d.tags} tags={[]}/>, document.querySelector('#app')))
         }>New Contest</button>
         </div>
     );
@@ -118,8 +118,38 @@ const MakeCompetitionWindow = (props) => {
     let month = dateObj.getMonth();
     let year = dateObj.getFullYear();
     let csrf = props.csrf;
+    let allTags = props.allTags;
+    let tags = props.tags;
+
+    let addTag = (e) => {
+        tags.push(e.target.id)
+        ReactDOM.render(<MakeCompetitionWindow csrf={csrf} allTags={allTags} tags={tags}/>, document.querySelector("#app"))
+    }
+
+    let tagNodes = props.allTags.map((tag) => (<span id={tag} onClick={addTag}>{tag}</span>))
     
-    console.log(props)
+    //https://www.w3schools.com/howto/howto_js_dropdown.asp
+    let dropdownClick = (e) => {
+        document.getElementById("myDropdown").classList.toggle("show");
+        e.preventDefault();
+        return false;
+    }
+
+    let  filterFunction =(e) =>{
+        var input, filter, div, a, i;
+        input = document.getElementById("myInput");
+        filter = input.value.toUpperCase();
+        div = document.getElementById("myDropdown");
+        a = div.getElementsByTagName("span");
+        for (i = 0; i < a.length; i++) {
+          let txtValue = a[i].textContent || a[i].innerText;
+          if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            a[i].style.display = "";
+          } else {
+            a[i].style.display = "none";
+          }
+        }
+      }
     //create form, with inputs for name, description, reward, and deadline
     return (
         <form id="competitionForm" name="competitionForm"
@@ -137,7 +167,14 @@ const MakeCompetitionWindow = (props) => {
         <label htmlFor="deadline">Deadline: </label>
         <input  className="formInput" id="deadline" type="text" name="deadline" placeholder={`${year}/${month}/${date}`}/>
         <label htmlFor="tags">Tags: </label>
-        <input  className="formInput" id="tags" type="text" name="tags" placeholder="Poetry"/>
+        <input  className="formInput" id="tags" type="text" name="tags" placeholder="Poetry" value={props.tags}/>
+        <div class="dropdown">
+            <button onClick={dropdownClick} className="dropbtn">Add Tag</button>
+            <div id="myDropdown" className="dropdown-content">
+                <input type="text" placeholder="Search.." id="myInput" onKeyUp={filterFunction}/>
+                {tagNodes}
+            </div>
+        </div>
         <input type="hidden" name="_csrf" value={csrf}/>
         <input className="formSubmit" type="submit" value="Submit" />
         </form>

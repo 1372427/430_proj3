@@ -336,7 +336,7 @@ var CompetitionWindow = function CompetitionWindow(props) {
             "button",
             { className: "formSubmit", onClick: function onClick() {
                     return sendAjax('GET', '/tags', null, function (d) {
-                        return ReactDOM.render(React.createElement(MakeCompetitionWindow, { csrf: csrf, tags: d.tags }), document.querySelector('#app'));
+                        return ReactDOM.render(React.createElement(MakeCompetitionWindow, { csrf: csrf, allTags: d.tags, tags: [] }), document.querySelector('#app'));
                     });
                 } },
             "New Contest"
@@ -360,8 +360,44 @@ var MakeCompetitionWindow = function MakeCompetitionWindow(props) {
     var month = dateObj.getMonth();
     var year = dateObj.getFullYear();
     var csrf = props.csrf;
+    var allTags = props.allTags;
+    var tags = props.tags;
 
-    console.log(props);
+    var addTag = function addTag(e) {
+        tags.push(e.target.id);
+        ReactDOM.render(React.createElement(MakeCompetitionWindow, { csrf: csrf, allTags: allTags, tags: tags }), document.querySelector("#app"));
+    };
+
+    var tagNodes = props.allTags.map(function (tag) {
+        return React.createElement(
+            "span",
+            { id: tag, onClick: addTag },
+            tag
+        );
+    });
+
+    //https://www.w3schools.com/howto/howto_js_dropdown.asp
+    var dropdownClick = function dropdownClick(e) {
+        document.getElementById("myDropdown").classList.toggle("show");
+        e.preventDefault();
+        return false;
+    };
+
+    var filterFunction = function filterFunction(e) {
+        var input, filter, div, a, i;
+        input = document.getElementById("myInput");
+        filter = input.value.toUpperCase();
+        div = document.getElementById("myDropdown");
+        a = div.getElementsByTagName("span");
+        for (i = 0; i < a.length; i++) {
+            var txtValue = a[i].textContent || a[i].innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                a[i].style.display = "";
+            } else {
+                a[i].style.display = "none";
+            }
+        }
+    };
     //create form, with inputs for name, description, reward, and deadline
     return React.createElement(
         "form",
@@ -400,7 +436,22 @@ var MakeCompetitionWindow = function MakeCompetitionWindow(props) {
             { htmlFor: "tags" },
             "Tags: "
         ),
-        React.createElement("input", { className: "formInput", id: "tags", type: "text", name: "tags", placeholder: "Poetry" }),
+        React.createElement("input", { className: "formInput", id: "tags", type: "text", name: "tags", placeholder: "Poetry", value: props.tags }),
+        React.createElement(
+            "div",
+            { "class": "dropdown" },
+            React.createElement(
+                "button",
+                { onClick: dropdownClick, className: "dropbtn" },
+                "Add Tag"
+            ),
+            React.createElement(
+                "div",
+                { id: "myDropdown", className: "dropdown-content" },
+                React.createElement("input", { type: "text", placeholder: "Search..", id: "myInput", onKeyUp: filterFunction }),
+                tagNodes
+            )
+        ),
         React.createElement("input", { type: "hidden", name: "_csrf", value: csrf }),
         React.createElement("input", { className: "formSubmit", type: "submit", value: "Submit" })
     );
@@ -574,7 +625,7 @@ var handleEnterContest = function handleEnterContest(id) {
 };
 
 var handleSort = function handleSort(e) {
-    loadCompetitionsFromServer(document.querySelector('select').value);
+    loadCompetitionsFromServer(document.querySelector('#sort').value);
 };
 
 //React Component to show current contests
@@ -639,9 +690,23 @@ var ContestList = function ContestList(props) {
                     'h3',
                     null,
                     'Tags: ',
-                    contest.tags
+                    contest.tags.join(", ")
                 )
             )
+        );
+    });
+
+    var addTag = function addTag(e) {
+        var selected = props.selectedTags;
+        selected.push(e.target.id);
+        ReactDOM.render(React.createElement(ContestList, { contests: props.contests, type: props.type, tags: props.tags, selectedTags: selected }), document.querySelector("#app"));
+    };
+
+    var tagNodes = props.tags.map(function (tag) {
+        return React.createElement(
+            'option',
+            { id: tag, onClick: addTag },
+            tag
         );
     });
 
@@ -652,7 +717,13 @@ var ContestList = function ContestList(props) {
         React.createElement(
             'h3',
             null,
-            'Filters: '
+            'Filters: ',
+            props.selectedTags
+        ),
+        React.createElement(
+            'select',
+            null,
+            tagNodes
         ),
         React.createElement(
             'h3',
@@ -661,7 +732,7 @@ var ContestList = function ContestList(props) {
         ),
         React.createElement(
             'select',
-            { onChange: handleSort },
+            { id: 'sort', onChange: handleSort },
             React.createElement(
                 'option',
                 { value: '"deadline"_-1' },
@@ -702,7 +773,11 @@ var loadCompetitionsFromServer = function loadCompetitionsFromServer(sort) {
     sendAjax('GET', '/accountInfo', null, function (data) {
         var type = data.account.type;
         sendAjax('GET', '/getContests?sort=' + sort, null, function (data) {
-            ReactDOM.render(React.createElement(ContestList, { contests: data.contests, type: type }), document.querySelector("#app"));
+            var contests = data.contests;
+            sendAjax('GET', '/tags', null, function (data) {
+
+                ReactDOM.render(React.createElement(ContestList, { contests: contests, type: type, tags: data.tags, selectedTags: [] }), document.querySelector("#app"));
+            });
         });
     });
 };
@@ -725,7 +800,7 @@ var setup = function setup(csrf) {
 
     homeButton.addEventListener("click", function (e) {
         e.preventDefault();
-        loadCompetitionsFromServer(csrf);
+        loadCompetitionsFromServer('"deadline"_1');
         return false;
     });
 
