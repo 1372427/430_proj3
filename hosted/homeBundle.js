@@ -630,6 +630,7 @@ var handleSort = function handleSort(e) {
 
 //React Component to show current contests
 var ContestList = function ContestList(props) {
+    console.log(props);
     //hide error message
     $("#domoMessage").animate({ width: 'hide' }, 350);
 
@@ -650,9 +651,15 @@ var ContestList = function ContestList(props) {
             )
         );
     }
+    var selectedTags = props.selectedTags;
 
     //for each contest, show its name, description, reward, and deadline
     var contestNodes = props.contests.map(function (contest) {
+        for (var i = 0; i < selectedTags.length; i++) {
+            console.log(contest.tags);
+            console.log(contest.tags.includes(selectedTags[i]));
+            if (!contest.tags.includes(selectedTags[i])) return;
+        }
         return React.createElement(
             'div',
             { id: contest._id, key: contest._id, className: 'domo', onClick: function onClick(e) {
@@ -690,22 +697,48 @@ var ContestList = function ContestList(props) {
                     'h3',
                     null,
                     'Tags: ',
-                    contest.tags.join(", ")
+                    contest.tags.map(function (e) {
+                        return React.createElement(
+                            'button',
+                            { onClick: function onClick(evt) {
+                                    evt.stopPropagation();addTag(evt, false);
+                                } },
+                            e
+                        );
+                    })
                 )
             )
         );
     });
 
-    var addTag = function addTag(e) {
+    var addTag = function addTag(e, fromSelect) {
+        var newTag = document.querySelector('#filter').value;
+        if (!fromSelect) newTag = e.target.innerHTML;
         var selected = props.selectedTags;
-        selected.push(e.target.id);
+        if (selected.includes(newTag)) return;
+        selected.push(newTag);
+        ReactDOM.render(React.createElement(ContestList, { contests: props.contests, type: props.type, tags: props.tags, selectedTags: selected }), document.querySelector("#app"));
+    };
+    var removeTag = function removeTag(e) {
+        console.log(e.target);
+        var selected = props.selectedTags;
+        selected = selected.filter(function (value) {
+            return value !== e.target.id;
+        });
         ReactDOM.render(React.createElement(ContestList, { contests: props.contests, type: props.type, tags: props.tags, selectedTags: selected }), document.querySelector("#app"));
     };
 
     var tagNodes = props.tags.map(function (tag) {
         return React.createElement(
             'option',
-            { id: tag, onClick: addTag },
+            { id: tag },
+            tag
+        );
+    });
+    var selectedNodes = props.selectedTags.map(function (tag) {
+        return React.createElement(
+            'button',
+            { id: tag, onClick: removeTag },
             tag
         );
     });
@@ -718,11 +751,19 @@ var ContestList = function ContestList(props) {
             'h3',
             null,
             'Filters: ',
-            props.selectedTags
+            props.selectedTags.join(", ")
         ),
+        selectedNodes,
         React.createElement(
             'select',
-            null,
+            { id: 'filter', onChange: function onChange(e) {
+                    return addTag(e, true);
+                } },
+            React.createElement(
+                'option',
+                { disabled: true, selected: true },
+                'Please Select'
+            ),
             tagNodes
         ),
         React.createElement(
@@ -735,23 +776,23 @@ var ContestList = function ContestList(props) {
             { id: 'sort', onChange: handleSort },
             React.createElement(
                 'option',
-                { value: '"deadline"_-1' },
+                { value: '"deadline"_1' },
                 'Oldest'
             ),
             React.createElement(
                 'option',
-                { value: '"deadline"_1' },
+                { value: '"deadline"_-1' },
                 'Newest'
             ),
             React.createElement(
                 'option',
                 { value: '"reward"_-1' },
-                'Least Reward'
+                'Most Reward'
             ),
             React.createElement(
                 'option',
                 { value: '"reward"_1' },
-                'Most Reward'
+                'Least Reward'
             ),
             React.createElement(
                 'option',

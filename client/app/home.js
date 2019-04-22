@@ -12,6 +12,7 @@ const handleSort = (e) => {
 
 //React Component to show current contests
 const ContestList = function(props){
+    console.log(props)
     //hide error message
     $("#domoMessage").animate({width:'hide'}, 350);
 
@@ -28,9 +29,15 @@ const ContestList = function(props){
             </div>
         );
     }
+    let selectedTags = props.selectedTags;
     
     //for each contest, show its name, description, reward, and deadline
     const contestNodes = props.contests.map(function(contest){
+        for(let i=0; i< selectedTags.length; i++){
+            console.log(contest.tags)
+            console.log(contest.tags.includes(selectedTags[i]))
+            if(!contest.tags.includes(selectedTags[i]))return ;
+        }
         return(
             <div id={contest._id} key={contest._id} className="domo" onClick={(e) =>handleEnterContest(contest)}>
                 <img src={`/assets/img/mascots/${contest.mascot}`} alt="cat" className="domoFace"/>
@@ -40,34 +47,46 @@ const ContestList = function(props){
                 <h3 >Description: {contest.description}</h3>
                 <h3 >Reward: ${contest.reward}</h3>
                 <h3 >Deadline: {contest.deadline.substring(0,10)}</h3>
-                <h3>Tags: {contest.tags.join(", ")}</h3>
+                <h3>Tags: {contest.tags.map((e)=> <button onClick={(evt) =>{evt.stopPropagation(); addTag(evt,false)}}>{e}</button>)}</h3>
                 </div>
             </div>
         );
     });
 
-    let addTag = (e) => {
+    let addTag = (e, fromSelect) => {
+        let newTag =  document.querySelector('#filter').value;
+        if(!fromSelect)newTag = e.target.innerHTML;
         let selected = props.selectedTags;
-        selected.push(e.target.id)
+        if(selected.includes(newTag))return;
+        selected.push(newTag)
+        ReactDOM.render( <ContestList contests={props.contests} type={props.type} tags={props.tags} selectedTags={selected}/>, document.querySelector("#app"))
+    }
+    let removeTag = (e) => {
+        console.log(e.target);
+        let selected = props.selectedTags;
+        selected = selected.filter((value) => value!==e.target.id)
         ReactDOM.render( <ContestList contests={props.contests} type={props.type} tags={props.tags} selectedTags={selected}/>, document.querySelector("#app"))
     }
 
-    let tagNodes = props.tags.map((tag) => (<option id={tag} onClick={addTag}>{tag}</option>))
+    let tagNodes = props.tags.map((tag) => (<option id={tag}>{tag}</option>))
+    let selectedNodes = props.selectedTags.map((tag) => (<button id={tag} onClick={removeTag}>{tag}</button>))
     
     //show all contests in list
     return (
         <div className="domoList">
-        <h3>Filters: {props.selectedTags}</h3>
-        <select>
+        <h3>Filters: {props.selectedTags.join(", ")}</h3>
+        {selectedNodes}
+        <select id="filter" onChange={(e) => addTag(e, true)}>
+        <option disabled selected>Please Select</option>
             {tagNodes}
         </select>
 
         <h3>Sort: </h3>
         <select id="sort" onChange={handleSort}>
-            <option value='"deadline"_-1'>Oldest</option>
-            <option value='"deadline"_1'>Newest</option>
-            <option value='"reward"_-1'>Least Reward</option>
-            <option value='"reward"_1'>Most Reward</option>
+            <option value='"deadline"_1'>Oldest</option>
+            <option value='"deadline"_-1'>Newest</option>
+            <option value='"reward"_-1'>Most Reward</option>
+            <option value='"reward"_1'>Least Reward</option>
             <option value='"name"_1'>A-Z</option>
             <option value='"name"_-1'>Z-A</option>
         </select>
