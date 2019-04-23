@@ -75,7 +75,7 @@ const CompetitionWindow = (props) => {
     //run through all contests and set up information
     const contestNodes = props.contests.map(function(contest){
         return(
-            <div id={contest._id} key={contest._id} className="domo" onClick={(e) =>contest.winner?handleError("Already Won!"):handlePickWinner(contest._id)}>
+            <div id={contest._id} key={contest._id} className="domoOwn" onClick={(e) =>contest.winner?handleError("Already Won!"):handlePickWinner(contest._id)}>
                 <img src={`/assets/img/mascots/${contest.mascot}`} alt="cat" className="domoFace"/>
                 
                 <div className="domoContent">
@@ -94,10 +94,12 @@ const CompetitionWindow = (props) => {
     return (
         <div className="domoList">
         
-            {contestNodes}
-            
-        <button className="formSubmit" onClick={() => sendAjax('GET','/tags', null, (d) => ReactDOM.render(<MakeCompetitionWindow csrf={csrf} allTags={d.tags} tags={[]}/>, document.querySelector('#app')))
+        <div style={{width: "97%", height: "50px"}}>
+                <button className="formSubmit" onClick={() => sendAjax('GET','/tags', null, (d) => ReactDOM.render(<MakeCompetitionWindow csrf={csrf} allTags={d.tags} tags={[]}/>, document.querySelector('#app')))
         }>New Contest</button>
+            </div>
+            {contestNodes}
+
         </div>
     );
 };
@@ -122,7 +124,9 @@ const MakeCompetitionWindow = (props) => {
     let tags = props.tags;
 
     let addTag = (e) => {
+        if(tags.includes(e.target.id))return;
         tags.push(e.target.id)
+        document.getElementById("myDropdown").classList.toggle("show");
         ReactDOM.render(<MakeCompetitionWindow csrf={csrf} allTags={allTags} tags={tags}/>, document.querySelector("#app"))
     }
 
@@ -136,15 +140,16 @@ const MakeCompetitionWindow = (props) => {
     }
 
     let  filterFunction =(e) =>{
-        var input, filter, div, a, i;
+        let input, filter, div, a, i, count=0;
         input = document.getElementById("myInput");
         filter = input.value.toUpperCase();
         div = document.getElementById("myDropdown");
         a = div.getElementsByTagName("span");
         for (i = 0; i < a.length; i++) {
           let txtValue = a[i].textContent || a[i].innerText;
-          if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          if (count<=5 && txtValue.toUpperCase().indexOf(filter) > -1) {
             a[i].style.display = "";
+            count++;
           } else {
             a[i].style.display = "none";
           }
@@ -166,9 +171,9 @@ const MakeCompetitionWindow = (props) => {
         <input  className="formInput" id="reward" type="text" name="reward" placeholder="10.00"/>
         <label htmlFor="deadline">Deadline: </label>
         <input  className="formInput" id="deadline" type="text" name="deadline" placeholder={`${year}/${month}/${date}`}/>
-        <label htmlFor="tags">Tags: </label>
-        <input  className="formInput" id="tags" type="text" name="tags" placeholder="Poetry" value={props.tags}/>
-        <div class="dropdown">
+        <label htmlFor="tags" id="tagsLabel">Tags: </label>
+        <textarea  className="formInput" id="tags" type="text" name="tags" placeholder="Poetry" value={props.tags}/>
+        <div className="dropdown">
             <button onClick={dropdownClick} className="dropbtn">Add Tag</button>
             <div id="myDropdown" className="dropdown-content">
                 <input type="text" placeholder="Search.." id="myInput" onKeyUp={filterFunction}/>

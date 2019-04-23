@@ -33,8 +33,10 @@ const EntryWindow = (props) => {
     //return form with input for name and entry content
     return (
         <div>
-            <h1>Contest Name: {contest.name}</h1>
-            <h1>Description: {contest.description}</h1>
+            <div className="entryLabel"> 
+                <h1>Contest Name: {contest.name}</h1>
+                <h1>Description: {contest.description}</h1>
+            </div>
             <form id="entryForm"
                 name="entryForm"
                 onSubmit={handleEntry}
@@ -44,8 +46,8 @@ const EntryWindow = (props) => {
             >
                 <label htmlFor="name">Name: </label>
                 <input  className="formInput" id="name" type="text" name="name" placeholder="name"/>
-                <label htmlFor="content">Content: </label>
-                <input  className="formInput" id="content" type="text" name="content" placeholder="entry"/>
+                <label htmlFor="content" id="tagsLabel">Content: </label>
+                <textarea  className="formInput" id="content" type="text" name="content" placeholder="entry"/>
                 <input type="hidden" name="_csrf" value={csrf}/>
                 <input type="hidden" name="contest" value={contest._id}/>
                 <input className="formSubmit" type="submit" value="Submit"/>

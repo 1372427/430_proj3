@@ -6,8 +6,8 @@ const handleEnterContest = (id) => {
     createEntryWindow(csrf, id);
 }
 
-const handleSort = (e) => {
-    loadCompetitionsFromServer(document.querySelector('#sort').value)
+const handleSort = (e, selectedTags) => {
+    loadCompetitionsFromServer(document.querySelector('#sort').value, selectedTags)
 }
 
 //React Component to show current contests
@@ -33,11 +33,11 @@ const ContestList = function(props){
     
     //for each contest, show its name, description, reward, and deadline
     const contestNodes = props.contests.map(function(contest){
+        let containsTag=false;
         for(let i=0; i< selectedTags.length; i++){
-            console.log(contest.tags)
-            console.log(contest.tags.includes(selectedTags[i]))
-            if(!contest.tags.includes(selectedTags[i]))return ;
+            if(contest.tags.includes(selectedTags[i]))containsTag=true ;
         }
+        if(!containsTag && selectedTags.length>0) return ;
         return(
             <div id={contest._id} key={contest._id} className="domo" onClick={(e) =>handleEnterContest(contest)}>
                 <img src={`/assets/img/mascots/${contest.mascot}`} alt="cat" className="domoFace"/>
@@ -47,7 +47,7 @@ const ContestList = function(props){
                 <h3 >Description: {contest.description}</h3>
                 <h3 >Reward: ${contest.reward}</h3>
                 <h3 >Deadline: {contest.deadline.substring(0,10)}</h3>
-                <h3>Tags: {contest.tags.map((e)=> <button onClick={(evt) =>{evt.stopPropagation(); addTag(evt,false)}}>{e}</button>)}</h3>
+                <h3>Tags: {contest.tags.map((e)=> <button onClick={(evt) =>{evt.stopPropagation(); addTag(evt,false)}} className="makeDomoSubmit">{e}</button>)}</h3>
                 </div>
             </div>
         );
@@ -69,27 +69,33 @@ const ContestList = function(props){
     }
 
     let tagNodes = props.tags.map((tag) => (<option id={tag}>{tag}</option>))
-    let selectedNodes = props.selectedTags.map((tag) => (<button id={tag} onClick={removeTag}>{tag}</button>))
+    let selectedNodes = props.selectedTags.map((tag) => (<button id={tag} onClick={removeTag} className="makeDomoSubmit">{tag}</button>))
     
     //show all contests in list
     return (
         <div className="domoList">
-        <h3>Filters: {props.selectedTags.join(", ")}</h3>
-        {selectedNodes}
-        <select id="filter" onChange={(e) => addTag(e, true)}>
-        <option disabled selected>Please Select</option>
-            {tagNodes}
-        </select>
+        <div id="filterSort">
+        
+        <h1>Click on a contest below to enter it!</h1>
+            <h3 className="filter">Filters: </h3>
+            {selectedNodes}
+            <br/>
+            <select id="filter" onChange={(e) => addTag(e, true)}>
+            <option disabled selected>Please Select</option>
+                {tagNodes}
+            </select>
+            <br/>
 
-        <h3>Sort: </h3>
-        <select id="sort" onChange={handleSort}>
-            <option value='"deadline"_1'>Oldest</option>
-            <option value='"deadline"_-1'>Newest</option>
-            <option value='"reward"_-1'>Most Reward</option>
-            <option value='"reward"_1'>Least Reward</option>
-            <option value='"name"_1'>A-Z</option>
-            <option value='"name"_-1'>Z-A</option>
-        </select>
+            <h3 className="sort">Sort: </h3>
+            <select id="sort" onChange={(e) => handleSort(e, props.selectedTags)}>
+                <option value='"deadline"_1'>Oldest</option>
+                <option value='"deadline"_-1'>Newest</option>
+                <option value='"reward"_-1'>Most Reward</option>
+                <option value='"reward"_1'>Least Reward</option>
+                <option value='"name"_1'>A-Z</option>
+                <option value='"name"_-1'>Z-A</option>
+            </select>
+        </div>
             {contestNodes}
         </div>
     );
@@ -97,7 +103,9 @@ const ContestList = function(props){
 
 
 //query the server to get the account type and current contests
-const loadCompetitionsFromServer = (sort) => {
+const loadCompetitionsFromServer = (sort, selectedTags) => {
+    let selected = selectedTags;
+    if(!selected)selected=[];
     sendAjax('GET', '/accountInfo', null, (data) => {
         let type = data.account.type;
         sendAjax('GET', `/getContests?sort=${sort}`, null, (data) => {
@@ -105,7 +113,7 @@ const loadCompetitionsFromServer = (sort) => {
             sendAjax('GET', '/tags', null, (data) => {
 
                 ReactDOM.render(
-                    <ContestList contests={contests} type={type} tags={data.tags} selectedTags={[]}/>, document.querySelector("#app")
+                    <ContestList contests={contests} type={type} tags={data.tags} selectedTags={selected}/>, document.querySelector("#app")
                 );
             })
         });

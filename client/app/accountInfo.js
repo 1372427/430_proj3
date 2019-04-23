@@ -74,7 +74,7 @@ const AccountInfo = function(props){
     //add two forms to change password or email 
     return (
         <div className="domoList">
-            <div className="domo">
+            <div className="domo" id="account">
                 <h3 >Username: {accountInfo.username}</h3>
                 <h3 >Mascot: {accountInfo.mascot}
                 <form id="mascotForm"

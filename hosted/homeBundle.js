@@ -86,7 +86,7 @@ var AccountInfo = function AccountInfo(props) {
         { className: "domoList" },
         React.createElement(
             "div",
-            { className: "domo" },
+            { className: "domo", id: "account" },
             React.createElement(
                 "h3",
                 null,
@@ -280,7 +280,7 @@ var CompetitionWindow = function CompetitionWindow(props) {
     var contestNodes = props.contests.map(function (contest) {
         return React.createElement(
             "div",
-            { id: contest._id, key: contest._id, className: "domo", onClick: function onClick(e) {
+            { id: contest._id, key: contest._id, className: "domoOwn", onClick: function onClick(e) {
                     return contest.winner ? handleError("Already Won!") : handlePickWinner(contest._id);
                 } },
             React.createElement("img", { src: "/assets/img/mascots/" + contest.mascot, alt: "cat", className: "domoFace" }),
@@ -331,16 +331,20 @@ var CompetitionWindow = function CompetitionWindow(props) {
     return React.createElement(
         "div",
         { className: "domoList" },
-        contestNodes,
         React.createElement(
-            "button",
-            { className: "formSubmit", onClick: function onClick() {
-                    return sendAjax('GET', '/tags', null, function (d) {
-                        return ReactDOM.render(React.createElement(MakeCompetitionWindow, { csrf: csrf, allTags: d.tags, tags: [] }), document.querySelector('#app'));
-                    });
-                } },
-            "New Contest"
-        )
+            "div",
+            { style: { width: "97%", height: "50px" } },
+            React.createElement(
+                "button",
+                { className: "formSubmit", onClick: function onClick() {
+                        return sendAjax('GET', '/tags', null, function (d) {
+                            return ReactDOM.render(React.createElement(MakeCompetitionWindow, { csrf: csrf, allTags: d.tags, tags: [] }), document.querySelector('#app'));
+                        });
+                    } },
+                "New Contest"
+            )
+        ),
+        contestNodes
     );
 };
 
@@ -364,7 +368,9 @@ var MakeCompetitionWindow = function MakeCompetitionWindow(props) {
     var tags = props.tags;
 
     var addTag = function addTag(e) {
+        if (tags.includes(e.target.id)) return;
         tags.push(e.target.id);
+        document.getElementById("myDropdown").classList.toggle("show");
         ReactDOM.render(React.createElement(MakeCompetitionWindow, { csrf: csrf, allTags: allTags, tags: tags }), document.querySelector("#app"));
     };
 
@@ -384,15 +390,21 @@ var MakeCompetitionWindow = function MakeCompetitionWindow(props) {
     };
 
     var filterFunction = function filterFunction(e) {
-        var input, filter, div, a, i;
+        var input = void 0,
+            filter = void 0,
+            div = void 0,
+            a = void 0,
+            i = void 0,
+            count = 0;
         input = document.getElementById("myInput");
         filter = input.value.toUpperCase();
         div = document.getElementById("myDropdown");
         a = div.getElementsByTagName("span");
         for (i = 0; i < a.length; i++) {
             var txtValue = a[i].textContent || a[i].innerText;
-            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            if (count <= 5 && txtValue.toUpperCase().indexOf(filter) > -1) {
                 a[i].style.display = "";
+                count++;
             } else {
                 a[i].style.display = "none";
             }
@@ -433,13 +445,13 @@ var MakeCompetitionWindow = function MakeCompetitionWindow(props) {
         React.createElement("input", { className: "formInput", id: "deadline", type: "text", name: "deadline", placeholder: year + "/" + month + "/" + date }),
         React.createElement(
             "label",
-            { htmlFor: "tags" },
+            { htmlFor: "tags", id: "tagsLabel" },
             "Tags: "
         ),
-        React.createElement("input", { className: "formInput", id: "tags", type: "text", name: "tags", placeholder: "Poetry", value: props.tags }),
+        React.createElement("textarea", { className: "formInput", id: "tags", type: "text", name: "tags", placeholder: "Poetry", value: props.tags }),
         React.createElement(
             "div",
-            { "class": "dropdown" },
+            { className: "dropdown" },
             React.createElement(
                 "button",
                 { onClick: dropdownClick, className: "dropbtn" },
@@ -512,16 +524,20 @@ var EntryWindow = function EntryWindow(props) {
         "div",
         null,
         React.createElement(
-            "h1",
-            null,
-            "Contest Name: ",
-            contest.name
-        ),
-        React.createElement(
-            "h1",
-            null,
-            "Description: ",
-            contest.description
+            "div",
+            { className: "entryLabel" },
+            React.createElement(
+                "h1",
+                null,
+                "Contest Name: ",
+                contest.name
+            ),
+            React.createElement(
+                "h1",
+                null,
+                "Description: ",
+                contest.description
+            )
         ),
         React.createElement(
             "form",
@@ -540,10 +556,10 @@ var EntryWindow = function EntryWindow(props) {
             React.createElement("input", { className: "formInput", id: "name", type: "text", name: "name", placeholder: "name" }),
             React.createElement(
                 "label",
-                { htmlFor: "content" },
+                { htmlFor: "content", id: "tagsLabel" },
                 "Content: "
             ),
-            React.createElement("input", { className: "formInput", id: "content", type: "text", name: "content", placeholder: "entry" }),
+            React.createElement("textarea", { className: "formInput", id: "content", type: "text", name: "content", placeholder: "entry" }),
             React.createElement("input", { type: "hidden", name: "_csrf", value: csrf }),
             React.createElement("input", { type: "hidden", name: "contest", value: contest._id }),
             React.createElement("input", { className: "formSubmit", type: "submit", value: "Submit" })
@@ -624,8 +640,8 @@ var handleEnterContest = function handleEnterContest(id) {
     createEntryWindow(csrf, id);
 };
 
-var handleSort = function handleSort(e) {
-    loadCompetitionsFromServer(document.querySelector('#sort').value);
+var handleSort = function handleSort(e, selectedTags) {
+    loadCompetitionsFromServer(document.querySelector('#sort').value, selectedTags);
 };
 
 //React Component to show current contests
@@ -655,11 +671,11 @@ var ContestList = function ContestList(props) {
 
     //for each contest, show its name, description, reward, and deadline
     var contestNodes = props.contests.map(function (contest) {
+        var containsTag = false;
         for (var i = 0; i < selectedTags.length; i++) {
-            console.log(contest.tags);
-            console.log(contest.tags.includes(selectedTags[i]));
-            if (!contest.tags.includes(selectedTags[i])) return;
+            if (contest.tags.includes(selectedTags[i])) containsTag = true;
         }
+        if (!containsTag && selectedTags.length > 0) return;
         return React.createElement(
             'div',
             { id: contest._id, key: contest._id, className: 'domo', onClick: function onClick(e) {
@@ -702,7 +718,7 @@ var ContestList = function ContestList(props) {
                             'button',
                             { onClick: function onClick(evt) {
                                     evt.stopPropagation();addTag(evt, false);
-                                } },
+                                }, className: 'makeDomoSubmit' },
                             e
                         );
                     })
@@ -738,7 +754,7 @@ var ContestList = function ContestList(props) {
     var selectedNodes = props.selectedTags.map(function (tag) {
         return React.createElement(
             'button',
-            { id: tag, onClick: removeTag },
+            { id: tag, onClick: removeTag, className: 'makeDomoSubmit' },
             tag
         );
     });
@@ -748,61 +764,73 @@ var ContestList = function ContestList(props) {
         'div',
         { className: 'domoList' },
         React.createElement(
-            'h3',
-            null,
-            'Filters: ',
-            props.selectedTags.join(", ")
-        ),
-        selectedNodes,
-        React.createElement(
-            'select',
-            { id: 'filter', onChange: function onChange(e) {
-                    return addTag(e, true);
-                } },
+            'div',
+            { id: 'filterSort' },
             React.createElement(
-                'option',
-                { disabled: true, selected: true },
-                'Please Select'
-            ),
-            tagNodes
-        ),
-        React.createElement(
-            'h3',
-            null,
-            'Sort: '
-        ),
-        React.createElement(
-            'select',
-            { id: 'sort', onChange: handleSort },
-            React.createElement(
-                'option',
-                { value: '"deadline"_1' },
-                'Oldest'
+                'h1',
+                null,
+                'Click on a contest below to enter it!'
             ),
             React.createElement(
-                'option',
-                { value: '"deadline"_-1' },
-                'Newest'
+                'h3',
+                { className: 'filter' },
+                'Filters: '
+            ),
+            selectedNodes,
+            React.createElement('br', null),
+            React.createElement(
+                'select',
+                { id: 'filter', onChange: function onChange(e) {
+                        return addTag(e, true);
+                    } },
+                React.createElement(
+                    'option',
+                    { disabled: true, selected: true },
+                    'Please Select'
+                ),
+                tagNodes
+            ),
+            React.createElement('br', null),
+            React.createElement(
+                'h3',
+                { className: 'sort' },
+                'Sort: '
             ),
             React.createElement(
-                'option',
-                { value: '"reward"_-1' },
-                'Most Reward'
-            ),
-            React.createElement(
-                'option',
-                { value: '"reward"_1' },
-                'Least Reward'
-            ),
-            React.createElement(
-                'option',
-                { value: '"name"_1' },
-                'A-Z'
-            ),
-            React.createElement(
-                'option',
-                { value: '"name"_-1' },
-                'Z-A'
+                'select',
+                { id: 'sort', onChange: function onChange(e) {
+                        return handleSort(e, props.selectedTags);
+                    } },
+                React.createElement(
+                    'option',
+                    { value: '"deadline"_1' },
+                    'Oldest'
+                ),
+                React.createElement(
+                    'option',
+                    { value: '"deadline"_-1' },
+                    'Newest'
+                ),
+                React.createElement(
+                    'option',
+                    { value: '"reward"_-1' },
+                    'Most Reward'
+                ),
+                React.createElement(
+                    'option',
+                    { value: '"reward"_1' },
+                    'Least Reward'
+                ),
+                React.createElement(
+                    'option',
+                    { value: '"name"_1' },
+                    'A-Z'
+                ),
+                React.createElement(
+                    'option',
+                    { value: '"name"_-1' },
+                    'Z-A'
+                )
             )
         ),
         contestNodes
@@ -810,14 +838,16 @@ var ContestList = function ContestList(props) {
 };
 
 //query the server to get the account type and current contests
-var loadCompetitionsFromServer = function loadCompetitionsFromServer(sort) {
+var loadCompetitionsFromServer = function loadCompetitionsFromServer(sort, selectedTags) {
+    var selected = selectedTags;
+    if (!selected) selected = [];
     sendAjax('GET', '/accountInfo', null, function (data) {
         var type = data.account.type;
         sendAjax('GET', '/getContests?sort=' + sort, null, function (data) {
             var contests = data.contests;
             sendAjax('GET', '/tags', null, function (data) {
 
-                ReactDOM.render(React.createElement(ContestList, { contests: contests, type: type, tags: data.tags, selectedTags: [] }), document.querySelector("#app"));
+                ReactDOM.render(React.createElement(ContestList, { contests: contests, type: type, tags: data.tags, selectedTags: selected }), document.querySelector("#app"));
             });
         });
     });
