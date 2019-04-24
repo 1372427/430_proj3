@@ -911,7 +911,7 @@ var MascotList = function MascotList(props) {
             { id: mascot, className: "domo", onClick: function onClick(e) {
                     return handleMascotClick(e, mascot);
                 } },
-            React.createElement("img", { src: "/assets/img/mascots/" + props.mascots[mascot], alt: "mascot", className: "domoFace" }),
+            React.createElement("img", { src: "/assets/img/mascots/" + props.mascots[mascot], alt: "mascot", className: "accountFace" }),
             React.createElement(
                 "div",
                 { className: "domoContent" },

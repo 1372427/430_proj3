@@ -7,7 +7,7 @@ const MascotList = (props) => {
     const mascotNodes = (Object.keys(props.mascots)).map(function(mascot){
         return(
             <div id={mascot}  className="domo" onClick={ (e) => handleMascotClick(e, mascot)}>
-                <img src={`/assets/img/mascots/${props.mascots[mascot]}`} alt="mascot" className="domoFace"/>
+                <img src={`/assets/img/mascots/${props.mascots[mascot]}`} alt="mascot" className="accountFace"/>
                 <div className="domoContent">
                 <h3 >Name: {mascot}</h3> 
                 </div>
