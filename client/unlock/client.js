@@ -43,7 +43,7 @@ const ResetWindow = (props) => {
         <label htmlFor="pass2">Password: </label>
         <input  className="formInput" id="pass2" type="password" name="pass2" placeholder="confirm password"/>
         <input type="hidden" name="_csrf" value={props.csrf}/>
-        <input className="formSubmit" type="submit" value="Reset Password" />
+        <input id="resetPassSubmit" className="formSubmit" type="submit" value="Reset Password" />
         </form>
         </div>
     );
