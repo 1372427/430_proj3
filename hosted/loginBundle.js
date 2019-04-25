@@ -57,6 +57,7 @@ var handleSignup = function handleSignup(e) {
     return false;
 };
 
+//when user clicks the forgot password button, send them to reset window page.
 var handleForgotPass = function handleForgotPass(e, csrf) {
     e.preventDefault();
 
@@ -67,8 +68,10 @@ var handleForgotPass = function handleForgotPass(e, csrf) {
     return false;
 };
 
+//check that username and email have been entered, then send reset request to server
 var handleReset = function handleReset(e) {
     e.preventDefault();
+    //check all fields have values
     if ($("#user").val() === '' || $("#email").val() === '') {
         handleError("All fields are required");
         return false;
@@ -173,6 +176,7 @@ var SignupWindow = function SignupWindow(props) {
     );
 };
 
+//Reach Component for requesting a password reset
 var ResetWindow = function ResetWindow(props) {
     //hide error message
     $("#domoMessage").animate({ width: 'hide' }, 350);

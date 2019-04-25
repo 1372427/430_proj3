@@ -23,7 +23,7 @@ var handleReset = function handleReset(e) {
     return false;
 };
 
-//React Component for login form
+//React Component for reset form
 var ResetWindow = function ResetWindow(props) {
     //hide error message
     $("#domoMessage").animate({ width: 'hide' }, 350);
@@ -58,25 +58,24 @@ var ResetWindow = function ResetWindow(props) {
             ),
             React.createElement("input", { className: "formInput", id: "pass2", type: "password", name: "pass2", placeholder: "confirm password" }),
             React.createElement("input", { type: "hidden", name: "_csrf", value: props.csrf }),
-            React.createElement("input", { className: "formSubmit", type: "submit", value: "Reset Password" })
+            React.createElement("input", { id: "resetPassSubmit", className: "formSubmit", type: "submit", value: "Reset Password" })
         )
     );
 };
 
-//call the react component for the login form
-var createLoginWindow = function createLoginWindow(csrf) {
+//call the react component for the reset form
+var createResetWindow = function createResetWindow(csrf) {
     ReactDOM.render(React.createElement(ResetWindow, { csrf: csrf }), document.querySelector("#content"));
 };
 
 //set up initial navbar connections and show react component for login
 var setup = function setup(csrf) {
 
-    createLoginWindow(csrf); //default view
+    createResetWindow(csrf); //default view
 };
 
 var getToken = function getToken() {
     sendAjax('GET', '/getToken', null, function (result) {
-        console.log('test');
         setup(result.csrfToken);
     });
 };

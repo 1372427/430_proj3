@@ -1,5 +1,34 @@
 "use strict";
 
+//update and show error message
+var handleError = function handleError(message) {
+    $("#errorMessage").text(message);
+    $("#domoMessage").animate({ width: 'toggle' }, 350);
+};
+
+//hide error message and redirect to given page
+var redirect = function redirect(response) {
+    $("#domoMessage").animate({ width: 'hide' }, 350);
+    window.location = response.redirect;
+};
+
+//send request using Ajax
+var sendAjax = function sendAjax(type, action, data, success, dataType) {
+    $.ajax({
+        cache: false,
+        type: type,
+        url: action,
+        data: data,
+        dataType: dataType ? dataType : "json",
+        success: success,
+        error: function error(xhr, status, _error) {
+            var messageObj = JSON.parse(xhr.responseText);
+            handleError(messageObj.error);
+        }
+    });
+};
+"use strict";
+
 //generic function to handle any account change. Takes in an event, and the name of the form
 //posts the form information and then reloads account information page
 var handleAccountChange = function handleAccountChange(e, formId) {
@@ -367,6 +396,7 @@ var MakeCompetitionWindow = function MakeCompetitionWindow(props) {
     var allTags = props.allTags;
     var tags = props.tags;
 
+    //adds a selected tag to the list of tags for the contest, if it is not already present
     var addTag = function addTag(e) {
         if (tags.includes(e.target.id)) return;
         tags.push(e.target.id);
@@ -382,13 +412,15 @@ var MakeCompetitionWindow = function MakeCompetitionWindow(props) {
         );
     });
 
-    //https://www.w3schools.com/howto/howto_js_dropdown.asp
+    //Dropdown and filter methods from https://www.w3schools.com/howto/howto_js_dropdown.asp
+    //show the dropdown when the button is clicked
     var dropdownClick = function dropdownClick(e) {
         document.getElementById("myDropdown").classList.toggle("show");
         e.preventDefault();
         return false;
     };
 
+    //filters the functions based on the search input
     var filterFunction = function filterFunction(e) {
         var input = void 0,
             filter = void 0,
@@ -410,6 +442,7 @@ var MakeCompetitionWindow = function MakeCompetitionWindow(props) {
             }
         }
     };
+
     //create form, with inputs for name, description, reward, and deadline
     return React.createElement(
         "form",
@@ -640,13 +673,13 @@ var handleEnterContest = function handleEnterContest(id) {
     createEntryWindow(csrf, id);
 };
 
+//gets contests from the server using the chosen sort method
 var handleSort = function handleSort(e, selectedTags) {
     loadCompetitionsFromServer(document.querySelector('#sort').value, selectedTags);
 };
 
 //React Component to show current contests
 var ContestList = function ContestList(props) {
-    console.log(props);
     //hide error message
     $("#domoMessage").animate({ width: 'hide' }, 350);
 
@@ -671,11 +704,14 @@ var ContestList = function ContestList(props) {
 
     //for each contest, show its name, description, reward, and deadline
     var contestNodes = props.contests.map(function (contest) {
+        //check to see if contest includes any of the tags selected
         var containsTag = false;
         for (var i = 0; i < selectedTags.length; i++) {
             if (contest.tags.includes(selectedTags[i])) containsTag = true;
         }
+        //if does not match filter tags, don't create the element
         if (!containsTag && selectedTags.length > 0) return;
+        //if does match any of the filter tags, create the element
         return React.createElement(
             'div',
             { id: contest._id, key: contest._id, className: 'domo', onClick: function onClick(e) {
@@ -727,6 +763,7 @@ var ContestList = function ContestList(props) {
         );
     });
 
+    //adds a selected tag to the array of tags to filter on if not already added
     var addTag = function addTag(e, fromSelect) {
         var newTag = document.querySelector('#filter').value;
         if (!fromSelect) newTag = e.target.innerHTML;
@@ -735,8 +772,9 @@ var ContestList = function ContestList(props) {
         selected.push(newTag);
         ReactDOM.render(React.createElement(ContestList, { contests: props.contests, type: props.type, tags: props.tags, selectedTags: selected }), document.querySelector("#app"));
     };
+
+    //removes the selected tag from the array of tags to filter on
     var removeTag = function removeTag(e) {
-        console.log(e.target);
         var selected = props.selectedTags;
         selected = selected.filter(function (value) {
             return value !== e.target.id;
@@ -937,34 +975,5 @@ var MascotList = function MascotList(props) {
 var handleMascotClick = function handleMascotClick(e, mascot) {
     sendAjax('POST', '/mascots', "mascot=" + mascot + "&_csrf=" + csrf, function () {
         location.reload();
-    });
-};
-"use strict";
-
-//update and show error message
-var handleError = function handleError(message) {
-    $("#errorMessage").text(message);
-    $("#domoMessage").animate({ width: 'toggle' }, 350);
-};
-
-//hide error message and redirect to given page
-var redirect = function redirect(response) {
-    $("#domoMessage").animate({ width: 'hide' }, 350);
-    window.location = response.redirect;
-};
-
-//send request using Ajax
-var sendAjax = function sendAjax(type, action, data, success, dataType) {
-    $.ajax({
-        cache: false,
-        type: type,
-        url: action,
-        data: data,
-        dataType: dataType ? dataType : "json",
-        success: success,
-        error: function error(xhr, status, _error) {
-            var messageObj = JSON.parse(xhr.responseText);
-            handleError(messageObj.error);
-        }
     });
 };
