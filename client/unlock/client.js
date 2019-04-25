@@ -22,7 +22,7 @@ const handleReset = (e) => {
 };
 
 
-//React Component for login form
+//React Component for reset form
 const ResetWindow = (props) => {
     //hide error message
     $("#domoMessage").animate({width:'hide'}, 350);
@@ -50,8 +50,8 @@ const ResetWindow = (props) => {
 };
 
 
-//call the react component for the login form
-const createLoginWindow = (csrf) => {
+//call the react component for the reset form
+const createResetWindow = (csrf) => {
     ReactDOM.render(
         <ResetWindow csrf={csrf} />,
         document.querySelector("#content")
@@ -62,12 +62,11 @@ const createLoginWindow = (csrf) => {
 //set up initial navbar connections and show react component for login
 const setup = (csrf) => {
 
-    createLoginWindow(csrf);//default view
+    createResetWindow(csrf);//default view
 };
 
 const getToken = () => {
     sendAjax('GET', '/getToken', null, (result) => {
-        console.log('test');
         setup(result.csrfToken);
     });
 };

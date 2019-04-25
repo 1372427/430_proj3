@@ -123,6 +123,8 @@ const MakeCompetitionWindow = (props) => {
     let allTags = props.allTags;
     let tags = props.tags;
 
+
+    //adds a selected tag to the list of tags for the contest, if it is not already present
     let addTag = (e) => {
         if(tags.includes(e.target.id))return;
         tags.push(e.target.id)
@@ -132,13 +134,15 @@ const MakeCompetitionWindow = (props) => {
 
     let tagNodes = props.allTags.map((tag) => (<span id={tag} onClick={addTag}>{tag}</span>))
     
-    //https://www.w3schools.com/howto/howto_js_dropdown.asp
+    //Dropdown and filter methods from https://www.w3schools.com/howto/howto_js_dropdown.asp
+    //show the dropdown when the button is clicked
     let dropdownClick = (e) => {
         document.getElementById("myDropdown").classList.toggle("show");
         e.preventDefault();
         return false;
     }
 
+    //filters the functions based on the search input
     let  filterFunction =(e) =>{
         let input, filter, div, a, i, count=0;
         input = document.getElementById("myInput");
@@ -154,7 +158,8 @@ const MakeCompetitionWindow = (props) => {
             a[i].style.display = "none";
           }
         }
-      }
+    }
+
     //create form, with inputs for name, description, reward, and deadline
     return (
         <form id="competitionForm" name="competitionForm"

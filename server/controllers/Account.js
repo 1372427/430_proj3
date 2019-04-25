@@ -231,10 +231,16 @@ const login = (request, response) => {
   // check if passowrd is correct
   return Account.AccountModel.authenticate(username, password, (err, account) => {
     if (err || !account) {
+      // if wrong password
       if (err && err.username) {
+        // update account for number of wrong sign in attempts
         return Account.AccountModel.updateOne({ _id: err._id },
           { signInAttempts: err.signInAttempts + 1 }).then(() => {
+            // if the number of sign in attempts is greater than 4, send to
+            // an exceeded page
             if (err.signInAttempts >= 4) {
+              // when sign in attempts is equal to four, send an email informing
+              // user their account has been locked
               if (err.signInAttempts === 4) {
                // send confirmation email
                 const mailOptions = {
@@ -264,6 +270,7 @@ const login = (request, response) => {
       return res.status(401).json({ error: 'Wrong login info' });
     }
 
+    // if correct password, but account is locked, send to the locked page
     if (account.signInAttempts >= 5) {
       return res.json({ redirect: '/exceed' });
     }
@@ -350,22 +357,26 @@ const signup = (request, response) => {
   });
 };
 
+// when user clicks on validation link, update account and send to home page
 const validate = (req, res) => {
   Account.AccountModel.updateOne(
     { username: req.query.username }, { validated: true }
   ).then(() => res.redirect('/home'));
 };
 
+// if account isn't validated, show message
 const notValid = (req, res) => res.render('notify', { message: [
   'An email has been sent.',
   'Please validate your account!'], mascot:
    'assets/img/mascots/9.png' });
 
+// if account is locked, show message
 const getTooManyAttempts = (req, res) => res.render('notify',
   { message: ['Too many login attempts!',
     'Please check your email to unlock your account.'],
     mascot: 'assets/img/mascots/9.png' });
 
+// when user clicks on unlock link, send them to reset their password
 const unlock = (req, request) => {
   const res = request;
   Account.AccountModel.updateOne(
@@ -373,9 +384,13 @@ const unlock = (req, request) => {
   ).then(() => res.redirect(`/resetPass/${req.query.username}`));
 };
 
+// render the reset form page
 const getReset = (req, res) => res.render('reset');
 
+// confirm username and email match, then send a link to email to reset
+// their password
 const getResetSendEmail = (req, res) => {
+  // check all fields filled
   if (!req.body.email || !req.body.username) {
     return res.status(400).json({ error: 'Fill out form!' });
   }
@@ -425,6 +440,7 @@ const getResetSendEmail = (req, res) => {
   });
 };
 
+// when an email has been sent to reset the password, show message
 const resetSent = (req, res) => res.render('notify', { message: ['An email has been sent',
   'Check your email to reset your password'],
   mascot: 'assets/img/mascots/9.png' });

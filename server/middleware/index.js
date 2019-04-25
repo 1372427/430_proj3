@@ -7,6 +7,7 @@ const requiresLogin = (req, res, next) => {
   return next();
 };
 
+// check if an account has been validated, if not, send to not valid page
 const requiresValidated = (req, res, next) => {
   Account.AccountModel.findById(req.session.account._id, (err, docs) => {
     if (err) {
@@ -18,6 +19,8 @@ const requiresValidated = (req, res, next) => {
   });
 };
 
+// check if an account has been validated, if not, send to next function, else send
+// to app home page
 const requiresNotValidated = (req, res, next) => {
   Account.AccountModel.findById(req.session.account._id, (err, docs) => {
     if (err) {

@@ -6,13 +6,13 @@ const handleEnterContest = (id) => {
     createEntryWindow(csrf, id);
 }
 
+//gets contests from the server using the chosen sort method
 const handleSort = (e, selectedTags) => {
     loadCompetitionsFromServer(document.querySelector('#sort').value, selectedTags)
 }
 
 //React Component to show current contests
 const ContestList = function(props){
-    console.log(props)
     //hide error message
     $("#domoMessage").animate({width:'hide'}, 350);
 
@@ -33,11 +33,14 @@ const ContestList = function(props){
     
     //for each contest, show its name, description, reward, and deadline
     const contestNodes = props.contests.map(function(contest){
+        //check to see if contest includes any of the tags selected
         let containsTag=false;
         for(let i=0; i< selectedTags.length; i++){
             if(contest.tags.includes(selectedTags[i]))containsTag=true ;
         }
+        //if does not match filter tags, don't create the element
         if(!containsTag && selectedTags.length>0) return ;
+        //if does match any of the filter tags, create the element
         return(
             <div id={contest._id} key={contest._id} className="domo" onClick={(e) =>handleEnterContest(contest)}>
                 <img src={`/assets/img/mascots/${contest.mascot}`} alt="cat" className="domoFace"/>
@@ -53,6 +56,7 @@ const ContestList = function(props){
         );
     });
 
+    //adds a selected tag to the array of tags to filter on if not already added
     let addTag = (e, fromSelect) => {
         let newTag =  document.querySelector('#filter').value;
         if(!fromSelect)newTag = e.target.innerHTML;
@@ -61,8 +65,9 @@ const ContestList = function(props){
         selected.push(newTag)
         ReactDOM.render( <ContestList contests={props.contests} type={props.type} tags={props.tags} selectedTags={selected}/>, document.querySelector("#app"))
     }
+    
+    //removes the selected tag from the array of tags to filter on
     let removeTag = (e) => {
-        console.log(e.target);
         let selected = props.selectedTags;
         selected = selected.filter((value) => value!==e.target.id)
         ReactDOM.render( <ContestList contests={props.contests} type={props.type} tags={props.tags} selectedTags={selected}/>, document.querySelector("#app"))

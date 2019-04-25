@@ -87,6 +87,7 @@ CompetitionSchema.statics.findById = (id, callback) => {
 };
 
 // search for competition by deadline greater than or equal to the given date
+// use sort function, if provided
 CompetitionSchema.statics.findByDeadline = (date, sort, callback) => {
   const search = {
     deadline: {

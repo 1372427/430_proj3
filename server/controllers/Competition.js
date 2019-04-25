@@ -113,11 +113,13 @@ const getContest = (req, res) => {
   return;
 };
 
+// return all tags being used in any contest
 const getTags = (request, response) => {
   const res = response;
   return Contest.ContestModel.getTags().then((d) => res.json({ tags: d }));
 };
 
+// add tags to a fake contest so tags are registered in database
 const addTag = (req, res) => {
   const tag = req.query.tag.split(',');
 

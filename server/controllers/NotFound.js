@@ -1,5 +1,6 @@
 const mascots = require('./Mascot.js');
 
+// for a custom 404 error page
 const notfoundPage = (req, res) => {
   let mascot = '10.png';
   if (req.session.account)mascot = mascots.mascots[req.session.account.mascot];
