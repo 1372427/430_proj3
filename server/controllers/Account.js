@@ -64,7 +64,7 @@ const upgrade = (req, res) => {
       const mailOptions = {
         from: 'contest430mvc@gmail.com',
         to: accountInfo.email,
-        subject: 'Account Creation Confirmation',
+        subject: 'Account Upgrade Confirmation',
         html: `Thank you ${accountInfo.username}. You updated your account with Contest.
          You can now create contests.`,
       };
@@ -381,7 +381,7 @@ const unlock = (req, request) => {
   const res = request;
   Account.AccountModel.updateOne(
     { username: req.query.username }, { signInAttempts: 0 }
-  ).then(() => res.redirect(`/resetPass/${req.query.username}`));
+  ).then(() => res.redirect(`/resetPage?username=${req.query.username}`));
 };
 
 // render the reset form page
